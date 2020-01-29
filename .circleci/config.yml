@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+    win: circleci/windows@2.2.0
+
 variables:
   build-parameters: &build-parameters
     parameters:
@@ -9,6 +12,15 @@ variables:
       nqp-rev:
         type: string
         default: ""
+  release-parameters: &release-parameters
+    parameters:
+      version:
+        type: string
+        default: ""
+      build-rev:
+        type: string
+        default: "01"
+
 
 jobs:
   test-linux:
@@ -27,6 +39,96 @@ jobs:
       - build-rakudo:
           nqp-rev: << parameters.nqp-rev >>
           moar-rev: << parameters.moar-rev >>
+
+  build-linux:
+    docker:
+      - image: centos:6
+    <<: *release-parameters
+    steps:
+      - run:
+          name: Update CentOS 6
+          command: |
+            yum -y update
+            yum clean all
+      - run:
+          name: Install dependencies
+          command:
+            yum install git perl perl-core gcc make
+      - checkout
+      - run:
+          name: Build Rakudo
+          command: |
+            perl Configure.pl --gen-moar --gen-nqp --backends=moar --relocatable
+            make
+            make install
+      - run:
+          name: Test the build
+          command:
+            make test
+      - run:
+          name: Build Zef
+          command: |
+            git clone https://github.com/ugexe/zef.git
+            cd zef
+            ../install/bin/raku -I. bin/zef install .
+      - run:
+          name: Prepare the package
+          command: |
+            cp -r tools/build/binary-release/Linux/* install
+            cp LICENSE install
+            mv install rakudo-<< parameters.version >>
+            tar -zcv --owner=0 --group=0 --numeric-owner -f rakudo.tar.gz rakudo-<< parameters.version >>
+      - store_artifacts:
+          path: rakudo.tar.gz
+          destination: rakudo-moar-<< parameters.version >>-<< parameters.build-rev >>-linux-x86_64.tar.gz
+  build-windows:
+    executor: win/default
+    working_directory: C:\rakudo
+    steps:
+      - checkout
+      - run:
+          name: Run build script
+          command:
+            tools/build/binary-release/build-windows.ps1
+      - store_artifacts:
+          path: rakudo.zip
+          destination: rakudo-moar-<< parameters.version >>-<< parameters.build-rev >>-win-x86_64.zip
+  build-macos:
+    macos:
+      xcode: 10.2.0
+    steps:
+      - run:
+          name: Install Perl
+          command: brew install perl
+      - checkout
+      - run:
+          name: Build Rakudo
+          command: |
+            perl Configure.pl --gen-moar --gen-nqp --backends=moar --relocatable
+            make
+            make install
+      - run:
+          name: Test the build
+          command:
+            make test
+      - run:
+          name: Build Zef
+          command: |
+            git clone https://github.com/ugexe/zef.git
+            cd zef
+            ../install/bin/raku -I. bin/zef install .
+      - run:
+          name: Prepare the package
+          command: |
+            cp -r tools/build/binary-release/MacOS/* install
+            cp LICENSE install
+            mv install rakudo-<< parameters.version >>
+            tar -zcv --owner=0 --group=0 --numeric-owner -f rakudo.tar.gz rakudo-<< parameters.version >>
+      - store_artifacts:
+          path: rakudo.tar.gz
+          destination: rakudo-moar-<< parameters.version >>-<< parameters.build-rev >>-macos-x86_64.tar.gz
+
+
 
 commands:
   build-rakudo:
@@ -54,3 +156,37 @@ workflows:
       - test-macos:
           nqp-rev: HEAD
           moar-rev: HEAD
+  build-release:
+    jobs:
+      - build-linux:
+          filters:
+            tags:
+              only: /\n\n\n\n\.\n\n(\.\n+)?/
+            branches:
+              ignore: /.*/
+          version: $CIRCLE_TAG
+      - build-macos:
+          filters:
+            tags:
+              only: /\n\n\n\n\.\n\n(\.\n+)?/
+            branches:
+              ignore: /.*/
+          version: $CIRCLE_TAG
+      - build-windows:
+          filters:
+            tags:
+              only: /\n\n\n\n\.\n\n(\.\n+)?/
+            branches:
+              ignore: /.*/
+          version: $CIRCLE_TAG
+      - zip-results:
+          requires:
+            - build-linux
+            - build-macos
+            - build-windows
+          filters:
+            tags:
+              only: /\n\n\n\n\.\n\n(\.\n+)?/
+            branches:
+              ignore: /.*/
+

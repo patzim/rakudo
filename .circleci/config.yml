@@ -162,22 +162,22 @@ workflows:
           filters:
             tags:
               only: /\n\n\n\n\.\n\n(\.\n+)?/
-            branches:
-              ignore: /.*/
+              #branches:
+              #ignore: /.*/
           version: $CIRCLE_TAG
       - build-macos:
           filters:
             tags:
               only: /\n\n\n\n\.\n\n(\.\n+)?/
-            branches:
-              ignore: /.*/
+              #branches:
+              #ignore: /.*/
           version: $CIRCLE_TAG
       - build-windows:
           filters:
             tags:
               only: /\n\n\n\n\.\n\n(\.\n+)?/
-            branches:
-              ignore: /.*/
+              #            branches:
+              #ignore: /.*/
           version: $CIRCLE_TAG
       - zip-results:
           requires:
@@ -187,6 +187,6 @@ workflows:
           filters:
             tags:
               only: /\n\n\n\n\.\n\n(\.\n+)?/
-            branches:
-              ignore: /.*/
+              #            branches:
+              #ignore: /.*/
 

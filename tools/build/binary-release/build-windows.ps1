@@ -16,6 +16,7 @@ Callstack: $(Get-PSCallStack | Out-String)
     }
 }
 
+$repoPath = Get-Location
 
 # Install Perl
 

@@ -22,10 +22,14 @@ variables:
   # Turn this Powershell console into a developer powershell console.
   # https://intellitect.com/enter-vsdevshell-powershell/
   PWSH_DEV: |
+    echo "PATH BEFORE ======================================="
+    echo $Env:PATH
     $installPath = &"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationpath
     $devShell    = &"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -find **\Microsoft.VisualStudio.DevShell.dll
     Import-Module $devShell
     Enter-VsDevShell -VsInstallPath $installPath -SkipAutomaticLocation -DevCmdArguments "-arch=amd64"
+    echo "PATH AFTER ======================================="
+    echo $Env:PATH
 
 
 stages:
@@ -47,11 +51,11 @@ stages:
          Windows_JVM:
           IMAGE_NAME: 'windows-2019'
           BACKEND: 'JVM'
-          RAKUDO_OPTIONS: '--backends=jvm  --gen-nqp'
+          RAKUDO_OPTIONS: '--backends=jvm --gen-nqp'
          Windows_JVM_NQP_master:
           IMAGE_NAME: 'windows-2019'
           BACKEND: 'JVM'
-          RAKUDO_OPTIONS: '--backends=jvm  --gen-nqp=master'
+          RAKUDO_OPTIONS: '--backends=jvm --gen-nqp=master'
          Windows_MoarVM_relocatable:
           IMAGE_NAME: 'windows-2019'
           RELOCATABLE: 'yes'
@@ -69,11 +73,11 @@ stages:
          MacOS_JVM:
           IMAGE_NAME: 'macOS-10.15'
           BACKEND: 'JVM'
-          RAKUDO_OPTIONS: '--backends=jvm  --gen-nqp'
+          RAKUDO_OPTIONS: '--backends=jvm --gen-nqp'
          MacOS_JVM_NQP_master:
           IMAGE_NAME: 'macOS-10.15'
           BACKEND: 'JVM'
-          RAKUDO_OPTIONS: '--backends=jvm  --gen-nqp=master'
+          RAKUDO_OPTIONS: '--backends=jvm --gen-nqp=master'
          MacOS_MoarVM_relocatable:
           IMAGE_NAME: 'macOS-10.15'
           RELOCATABLE: 'yes'
@@ -91,11 +95,11 @@ stages:
          Linux_JVM:
           IMAGE_NAME: 'ubuntu-18.04'
           BACKEND: 'JVM'
-          RAKUDO_OPTIONS: '--backends=jvm  --gen-nqp'
+          RAKUDO_OPTIONS: '--backends=jvm --gen-nqp'
          Linux_JVM_NQP_master:
           IMAGE_NAME: 'ubuntu-18.04'
           BACKEND: 'JVM'
-          RAKUDO_OPTIONS: '--backends=jvm  --gen-nqp=master'
+          RAKUDO_OPTIONS: '--backends=jvm --gen-nqp=master'
          Linux_MoarVM_relocatable:
           IMAGE_NAME: 'ubuntu-18.04'
           RELOCATABLE: 'yes'

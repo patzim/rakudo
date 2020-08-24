@@ -45,7 +45,7 @@ nmake install
 CheckLastExitCode
 
 echo "========= Testing Rakudo"
-nmake test
+#nmake test
 CheckLastExitCode
 
 echo "========= Cloning Zef"

@@ -45,7 +45,7 @@ nmake install
 CheckLastExitCode
 
 echo "========= Testing Rakudo"
-prove -e ..\install\bin\perl6 -vlr t
+prove -e install\bin\raku.exe -vlr t
 CheckLastExitCode
 
 echo "========= Cloning Zef"

@@ -228,6 +228,7 @@ stages:
   jobs:
     - job: linux
       displayName: Linux x86_64 build
+      timeoutInMinutes: 180
       pool:
         vmImage: 'ubuntu-18.04'
       container:
@@ -252,6 +253,7 @@ stages:
 
     - job: macos
       displayName: MacOS x86_64 build
+      timeoutInMinutes: 180
       pool:
         vmImage: 'macOS-10.15'
       workspace:
@@ -269,6 +271,7 @@ stages:
 
     - job: windows
       displayName: Windows x86_64 build
+      timeoutInMinutes: 180
       pool:
         vmImage: 'windows-2019'
       workspace:

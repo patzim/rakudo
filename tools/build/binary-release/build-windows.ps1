@@ -46,7 +46,7 @@ CheckLastExitCode
 
 echo "========= Testing Rakudo"
 rm -r t\spec
-prove -e install\bin\raku.exe -vlr t
+prove -e install\bin\raku -vlr t
 CheckLastExitCode
 
 echo "========= Cloning Zef"
